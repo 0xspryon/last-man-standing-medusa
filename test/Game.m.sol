@@ -19,7 +19,7 @@ contract GameMedusaTest is TestSetup {
         assert(game.claimFee() == expectedClaimFee);
     }
 
-    // Invariant: sum of all user claims equals `totalClaims`
+    // System-wide Invariant: sum of all user claims equals `totalClaims`
     function test_sumUserClaimsEqualsTotalClaims() public view {
         uint expectedTotalClaims = 0;
         for (uint i = 0; i < ghost_players.length; i++) {
