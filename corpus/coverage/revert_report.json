@@ -1,0 +1,450 @@
+{
+	"contractRevertMetrics": {
+		"GameMedusaTest": {
+			"name": "GameMedusaTest",
+			"functionRevertMetrics": {
+				"FEE_INCREASE_PERCENTAGE": {
+					"name": "FEE_INCREASE_PERCENTAGE",
+					"totalCalls": 143,
+					"totalReverts": 0,
+					"pct": 0,
+					"prevPct": 0,
+					"revertReasonMetrics": {}
+				},
+				"GRACE_PERIOD": {
+					"name": "GRACE_PERIOD",
+					"totalCalls": 176,
+					"totalReverts": 0,
+					"pct": 0,
+					"prevPct": 0,
+					"revertReasonMetrics": {}
+				},
+				"INITIAL_CLAIM_FEE": {
+					"name": "INITIAL_CLAIM_FEE",
+					"totalCalls": 222,
+					"totalReverts": 0,
+					"pct": 0,
+					"prevPct": 0,
+					"revertReasonMetrics": {}
+				},
+				"PLATFORM_FEE_PERCENTAGE": {
+					"name": "PLATFORM_FEE_PERCENTAGE",
+					"totalCalls": 139,
+					"totalReverts": 0,
+					"pct": 0,
+					"prevPct": 0,
+					"revertReasonMetrics": {}
+				},
+				"deployer": {
+					"name": "deployer",
+					"totalCalls": 217,
+					"totalReverts": 0,
+					"pct": 0,
+					"prevPct": 0,
+					"revertReasonMetrics": {}
+				},
+				"game": {
+					"name": "game",
+					"totalCalls": 145,
+					"totalReverts": 0,
+					"pct": 0,
+					"prevPct": 0,
+					"revertReasonMetrics": {}
+				},
+				"game_claimThrone": {
+					"name": "game_claimThrone",
+					"totalCalls": 466668,
+					"totalReverts": 465388,
+					"pct": 0.9972571506938551,
+					"prevPct": 0.9691463532620463,
+					"revertReasonMetrics": {
+						"Amount should be less than 20_000 ether": {
+							"reason": "Amount should be less than 20_000 ether",
+							"count": 264147,
+							"pct": 0.5660276684923757,
+							"prevPct": 0.5840171014986847
+						},
+						"Can not be called by owner": {
+							"reason": "Can not be called by owner",
+							"count": 73705,
+							"pct": 0.15793883446047297,
+							"prevPct": 0.10600441358721442
+						},
+						"Game: Game has already ended. Reset to play again.": {
+							"reason": "Game: Game has already ended. Reset to play again.",
+							"count": 856,
+							"pct": 0.0018342804734843615,
+							"prevPct": 0.02289721133158571
+						},
+						"Game: Insufficient ETH sent to claim the throne.": {
+							"reason": "Game: Insufficient ETH sent to claim the throne.",
+							"count": 126632,
+							"pct": 0.27135351041854167,
+							"prevPct": 0.2562184126750116
+						},
+						"Game: You are already the king. No need to re-claim.": {
+							"reason": "Game: You are already the king. No need to re-claim.",
+							"count": 48,
+							"pct": 0.00010285684898043148,
+							"prevPct": 0.000009214169549933889
+						}
+					}
+				},
+				"game_declareWinner": {
+					"name": "game_declareWinner",
+					"totalCalls": 420776,
+					"totalReverts": 419953,
+					"pct": 0.9980440899671084,
+					"prevPct": 0.9758927887683472,
+					"revertReasonMetrics": {
+						"Can not be called by owner": {
+							"reason": "Can not be called by owner",
+							"count": 70791,
+							"pct": 0.16823915812688936,
+							"prevPct": 0.19358264199106573
+						},
+						"Game: Game has already ended. Reset to play again.": {
+							"reason": "Game: Game has already ended. Reset to play again.",
+							"count": 2518,
+							"pct": 0.005984181607316006,
+							"prevPct": 0.06506190172303765
+						},
+						"Game: Grace period has not expired yet.": {
+							"reason": "Game: Grace period has not expired yet.",
+							"count": 1888,
+							"pct": 0.004486947924786585,
+							"prevPct": 0.05608679004467135
+						},
+						"Game: No one has claimed the throne yet.": {
+							"reason": "Game: No one has claimed the throne yet.",
+							"count": 344260,
+							"pct": 0.8181550278532996,
+							"prevPct": 0.6519361837906829
+						},
+						"panic: arithmetic underflow/overflow": {
+							"reason": "panic: arithmetic underflow/overflow",
+							"count": 496,
+							"pct": 0.0011787744548168147,
+							"prevPct": 0.009225271218889598
+						}
+					}
+				},
+				"game_resetGame": {
+					"name": "game_resetGame",
+					"totalCalls": 463235,
+					"totalReverts": 462735,
+					"pct": 0.9989206342353233,
+					"prevPct": 0.984054747314471,
+					"revertReasonMetrics": {
+						"Game: Game has not ended yet.": {
+							"reason": "Game: Game has not ended yet.",
+							"count": 79440,
+							"pct": 0.1714896326918303,
+							"prevPct": 0.2199967875864553
+						},
+						"OwnableUnauthorizedAccount": {
+							"reason": "OwnableUnauthorizedAccount",
+							"count": 383295,
+							"pct": 0.827431001543493,
+							"prevPct": 0.7640579597280156
+						}
+					}
+				},
+				"game_updateClaimFeeParameters": {
+					"name": "game_updateClaimFeeParameters",
+					"totalCalls": 448540,
+					"totalReverts": 430843,
+					"pct": 0.9605453248316761,
+					"prevPct": 0.9711438124241327,
+					"revertReasonMetrics": {
+						"Can not update parameter if game isn't ended.": {
+							"reason": "Can not update parameter if game isn't ended.",
+							"count": 2572,
+							"pct": 0.005734159718196816,
+							"prevPct": 0.0718263517686394
+						},
+						"Game: New initial claim fee must be greater than zero.": {
+							"reason": "Game: New initial claim fee must be greater than zero.",
+							"count": 1632,
+							"pct": 0.0036384714852632986,
+							"prevPct": 0.006255723321336542
+						},
+						"Game: Percentage must be 0-100.": {
+							"reason": "Game: Percentage must be 0-100.",
+							"count": 51291,
+							"pct": 0.1143510054844607,
+							"prevPct": 0.09378793364141662
+						},
+						"OwnableUnauthorizedAccount": {
+							"reason": "OwnableUnauthorizedAccount",
+							"count": 375348,
+							"pct": 0.8368216881437553,
+							"prevPct": 0.7992738036927401
+						}
+					}
+				},
+				"game_updateGracePeriod": {
+					"name": "game_updateGracePeriod",
+					"totalCalls": 509403,
+					"totalReverts": 393054,
+					"pct": 0.7715973404161341,
+					"prevPct": 0.8589107793829321,
+					"revertReasonMetrics": {
+						"Game: New grace period must be greater than zero.": {
+							"reason": "Game: New grace period must be greater than zero.",
+							"count": 6629,
+							"pct": 0.013013272399259526,
+							"prevPct": 0.013353257081538608
+						},
+						"OwnableUnauthorizedAccount": {
+							"reason": "OwnableUnauthorizedAccount",
+							"count": 386425,
+							"pct": 0.7585840680168746,
+							"prevPct": 0.8455575223013935
+						}
+					}
+				},
+				"game_updatePlatformFeePercentage": {
+					"name": "game_updatePlatformFeePercentage",
+					"totalCalls": 471353,
+					"totalReverts": 437047,
+					"pct": 0.9272180297993223,
+					"prevPct": 0.9365351367064979,
+					"revertReasonMetrics": {
+						"Game: Percentage must be 0-100.": {
+							"reason": "Game: Percentage must be 0-100.",
+							"count": 48936,
+							"pct": 0.10382027906897803,
+							"prevPct": 0.08842954553568241
+						},
+						"OwnableUnauthorizedAccount": {
+							"reason": "OwnableUnauthorizedAccount",
+							"count": 388111,
+							"pct": 0.8233977507303444,
+							"prevPct": 0.8481055911708155
+						}
+					}
+				},
+				"game_withdrawPlatformFees": {
+					"name": "game_withdrawPlatformFees",
+					"totalCalls": 436129,
+					"totalReverts": 435343,
+					"pct": 0.9981977809317886,
+					"prevPct": 0.9787682410913758,
+					"revertReasonMetrics": {
+						"Game: No platform fees to withdraw.": {
+							"reason": "Game: No platform fees to withdraw.",
+							"count": 71331,
+							"pct": 0.1635548197895577,
+							"prevPct": 0.14153449632669446
+						},
+						"OwnableUnauthorizedAccount": {
+							"reason": "OwnableUnauthorizedAccount",
+							"count": 364012,
+							"pct": 0.8346429611422308,
+							"prevPct": 0.8372337447646814
+						}
+					}
+				},
+				"game_withdrawWinnings": {
+					"name": "game_withdrawWinnings",
+					"totalCalls": 467761,
+					"totalReverts": 467565,
+					"pct": 0.9995809825958129,
+					"prevPct": 0.996969512296467,
+					"revertReasonMetrics": {
+						"Can not be called by owner": {
+							"reason": "Can not be called by owner",
+							"count": 81589,
+							"pct": 0.17442454586850978,
+							"prevPct": 0.19545814658252955
+						},
+						"Game: No winnings to withdraw.": {
+							"reason": "Game: No winnings to withdraw.",
+							"count": 385976,
+							"pct": 0.8251564367273031,
+							"prevPct": 0.8015113657139374
+						}
+					}
+				},
+				"ghost_claimFee": {
+					"name": "ghost_claimFee",
+					"totalCalls": 154,
+					"totalReverts": 0,
+					"pct": 0,
+					"prevPct": 0,
+					"revertReasonMetrics": {}
+				},
+				"ghost_claimFeeIncreasePercentage": {
+					"name": "ghost_claimFeeIncreasePercentage",
+					"totalCalls": 164,
+					"totalReverts": 0,
+					"pct": 0,
+					"prevPct": 0,
+					"revertReasonMetrics": {}
+				},
+				"ghost_playerClaimCount": {
+					"name": "ghost_playerClaimCount",
+					"totalCalls": 798,
+					"totalReverts": 0,
+					"pct": 0,
+					"prevPct": 0,
+					"revertReasonMetrics": {}
+				},
+				"ghost_players": {
+					"name": "ghost_players",
+					"totalCalls": 391,
+					"totalReverts": 328,
+					"pct": 0.8388746803069054,
+					"prevPct": 0.9888663967611336,
+					"revertReasonMetrics": {
+						"unknown": {
+							"reason": "unknown",
+							"count": 328,
+							"pct": 0.8388746803069054,
+							"prevPct": 0.9888663967611336
+						}
+					}
+				},
+				"maliciousActor": {
+					"name": "maliciousActor",
+					"totalCalls": 167,
+					"totalReverts": 0,
+					"pct": 0,
+					"prevPct": 0,
+					"revertReasonMetrics": {}
+				},
+				"player1": {
+					"name": "player1",
+					"totalCalls": 184,
+					"totalReverts": 0,
+					"pct": 0,
+					"prevPct": 0,
+					"revertReasonMetrics": {}
+				},
+				"player2": {
+					"name": "player2",
+					"totalCalls": 224,
+					"totalReverts": 0,
+					"pct": 0,
+					"prevPct": 0,
+					"revertReasonMetrics": {}
+				},
+				"player3": {
+					"name": "player3",
+					"totalCalls": 159,
+					"totalReverts": 0,
+					"pct": 0,
+					"prevPct": 0,
+					"revertReasonMetrics": {}
+				},
+				"test_claimFeeUpdatesPerFeeIncreasePercentage": {
+					"name": "test_claimFeeUpdatesPerFeeIncreasePercentage",
+					"totalCalls": 260,
+					"totalReverts": 203,
+					"pct": 0.7807692307692308,
+					"prevPct": 0.572347266881029,
+					"revertReasonMetrics": {
+						"No king yet": {
+							"reason": "No king yet",
+							"count": 151,
+							"pct": 0.5807692307692308,
+							"prevPct": 0.24758842443729903
+						},
+						"unknown": {
+							"reason": "unknown",
+							"count": 52,
+							"pct": 0.2,
+							"prevPct": 0.3247588424437299
+						}
+					}
+				},
+				"test_sumUserClaimsEqualsTotalClaims": {
+					"name": "test_sumUserClaimsEqualsTotalClaims",
+					"totalCalls": 190,
+					"totalReverts": 0,
+					"pct": 0,
+					"prevPct": 0,
+					"revertReasonMetrics": {}
+				}
+			}
+		},
+		"stdError": {
+			"name": "stdError",
+			"functionRevertMetrics": {
+				"arithmeticError": {
+					"name": "arithmeticError",
+					"totalCalls": 7886,
+					"totalReverts": 0,
+					"pct": 0,
+					"prevPct": 0,
+					"revertReasonMetrics": {}
+				},
+				"assertionError": {
+					"name": "assertionError",
+					"totalCalls": 948,
+					"totalReverts": 0,
+					"pct": 0,
+					"prevPct": 0,
+					"revertReasonMetrics": {}
+				},
+				"divisionError": {
+					"name": "divisionError",
+					"totalCalls": 1217,
+					"totalReverts": 0,
+					"pct": 0,
+					"prevPct": 0,
+					"revertReasonMetrics": {}
+				},
+				"encodeStorageError": {
+					"name": "encodeStorageError",
+					"totalCalls": 2831,
+					"totalReverts": 0,
+					"pct": 0,
+					"prevPct": 0,
+					"revertReasonMetrics": {}
+				},
+				"enumConversionError": {
+					"name": "enumConversionError",
+					"totalCalls": 2207,
+					"totalReverts": 0,
+					"pct": 0,
+					"prevPct": 0,
+					"revertReasonMetrics": {}
+				},
+				"indexOOBError": {
+					"name": "indexOOBError",
+					"totalCalls": 1281,
+					"totalReverts": 0,
+					"pct": 0,
+					"prevPct": 0,
+					"revertReasonMetrics": {}
+				},
+				"memOverflowError": {
+					"name": "memOverflowError",
+					"totalCalls": 1601,
+					"totalReverts": 0,
+					"pct": 0,
+					"prevPct": 0,
+					"revertReasonMetrics": {}
+				},
+				"popError": {
+					"name": "popError",
+					"totalCalls": 1079,
+					"totalReverts": 0,
+					"pct": 0,
+					"prevPct": 0,
+					"revertReasonMetrics": {}
+				},
+				"zeroVarError": {
+					"name": "zeroVarError",
+					"totalCalls": 3668,
+					"totalReverts": 0,
+					"pct": 0,
+					"prevPct": 0,
+					"revertReasonMetrics": {}
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,2228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Medusa Revert Report</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap">
+    <style>
+        :root {
+             
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --primary-light: rgba(99,102,241,0.1);
+            --success: #22c55e;
+            --warning: #eab308;
+            --danger: #ef4444;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --surface: #fff;
+            --text: var(--gray-800);
+            --text-light: var(--gray-500);
+            --radius: 0.375rem;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow: 0 1px 3px rgba(0,0,0,0.1);
+             
+            --success-rgb: 34,197,94;
+            --warning-rgb: 234,179,8;
+            --danger-rgb: 239,68,68;
+        }
+
+         
+        * {box-sizing:border-box;margin:0;padding:0}
+        
+        body {
+            font-family:'Inter',-apple-system,sans-serif;
+            font-size:0.875rem;
+            line-height:1.5;
+            color:var(--text);
+            background:var(--gray-50);
+            min-height:100vh;
+            display:flex;
+            flex-direction:column;
+        }
+        
+        a {color:var(--primary);text-decoration:none}
+        a:hover {color:var(--primary-hover);text-decoration:underline}
+        
+         
+        .app-container {
+            display:flex;
+            flex-direction:column;
+            min-height:100vh;
+        }
+        
+        header {
+            background:var(--surface);
+            border-bottom:1px solid var(--gray-200);
+            padding:1rem 1.5rem;
+            z-index:10;
+            box-shadow:var(--shadow-sm);
+        }
+        
+        .header-content {
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            max-width:1400px;
+            margin:0 auto;
+            width:100%;
+        }
+        
+        .logo-text {
+            font-size:1.5rem;
+            font-weight:600;
+            color:var(--gray-800);
+        }
+        
+        .btn {
+            display:inline-flex;
+            align-items:center;
+            justify-content:center;
+            height:2.25rem;
+            padding:0 1rem;
+            font-size:0.875rem;
+            font-weight:500;
+            border-radius:var(--radius);
+            transition:all 0.2s;
+            border:1px solid transparent;
+        }
+        
+        .btn-secondary {
+            background:#B92B3D;
+            border-color:#B92B3D;
+            color:white;
+        }
+        
+        .btn-secondary:hover {
+            background:#9e2434;
+            border-color:#9e2434;
+        }
+        
+        .btn-sm {
+            height:2rem;
+            padding:0 1rem;
+            font-size:0.75rem;
+        }
+        
+         
+        .main-content {
+            flex:1;
+            max-width:1400px;
+            margin:0 auto;
+            width:100%;
+            padding:1.5rem;
+        }
+        
+         
+        .stats-container {
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+            gap:1rem;
+            margin-bottom:1.5rem;
+        }
+        
+        .stat-card {
+            background:var(--surface);
+            border-radius:var(--radius);
+            padding:1.25rem;
+            box-shadow:var(--shadow);
+            display:flex;
+            flex-direction:column;
+        }
+        
+        .stat-title {
+            font-size:0.875rem;
+            color:var(--text-light);
+            margin-bottom:0.5rem;
+        }
+        
+        .stat-value {
+            font-size:1.5rem;
+            font-weight:600;
+            margin-bottom:0.5rem;
+        }
+        
+         
+        .contract-card {
+            background:var(--surface);
+            border-radius:var(--radius);
+            margin-bottom:1.5rem;
+            overflow:hidden;
+            box-shadow:var(--shadow);
+        }
+        
+        .contract-header {
+            background:#12181E;
+            color:white;
+            padding:1rem 1.25rem;
+            font-weight:600;
+            font-size:1.5rem;
+        }
+        
+        .contract-content {
+            padding:1.25rem;
+        }
+        
+         
+        .revert-table {
+            width:100%;
+            border-collapse:collapse;
+            margin-bottom:1.5rem;
+            background:var(--surface);
+        }
+        
+        .revert-table th, .revert-table td {
+            padding:0.75rem;
+            border:1px solid var(--gray-200);
+            text-align:left;
+        }
+        
+        .revert-table th {
+            background:var(--gray-100);
+            font-weight:500;
+            color:var(--gray-700);
+        }
+        
+        .revert-table tr:nth-child(even) {
+            background:var(--gray-50);
+        }
+        
+        .revert-table tr:hover {
+            background:var(--gray-100);
+        }
+        
+         
+        .progress-container {
+            width:100%;
+            height:0.5rem;
+            background:var(--gray-200);
+            border-radius:9999px;
+            overflow:hidden;
+            margin-top:0.75rem;
+        }
+        
+        .progress-bar {
+            height:100%;
+            transition:width 0.3s;
+            border-radius:9999px;
+        }
+        
+         
+        .revert-percentage {
+            text-align:center;
+            white-space:nowrap;
+        }
+        
+        .revert-reason {
+            display:inline-block;
+            padding:0.375rem 0.625rem;
+            border-radius:var(--radius);
+            background:var(--gray-100);
+            border-left:3px solid var(--warning);
+            font-family:'JetBrains Mono',monospace;
+            font-size:0.8125rem;
+            line-height:1.4;
+        }
+        
+         
+        .change-positive {
+            color:var(--danger);
+        }
+        
+        .change-negative {
+            color:var(--success);
+        }
+        
+        .change-neutral {
+            color:var(--gray-500);
+        }
+        
+         
+        h2 {
+            font-size:1.25rem;
+            font-weight:600;
+            margin:1.5rem 0 1rem;
+            color:var(--gray-800);
+        }
+        
+        h3 {
+            font-size:1.125rem;
+            font-weight:500;
+            margin:1.25rem 0 0.75rem;
+            color:var(--gray-700);
+        }
+        
+        h4 {
+            font-size:1rem;
+            font-weight:500;
+            margin:1rem 0 0.5rem;
+            color:var(--gray-700);
+        }
+        
+         
+        footer {
+            background:var(--surface);
+            border-top:1px solid var(--gray-200);
+            padding:1rem;
+            text-align:center;
+            font-size:0.875rem;
+            color:var(--gray-500);
+            margin-top:auto;
+        }
+        
+         
+        .scroll-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--primary);
+            color: white;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(1rem);
+            transition: opacity 0.3s, transform 0.3s;
+            z-index: 100;
+        }
+        
+        .scroll-top.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .scroll-top:hover {
+            background: var(--primary-hover);
+        }
+        
+         
+        .jump-links {
+            display: none;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+        
+        .jump-links summary {
+            cursor: pointer;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        
+        .jump-links-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+        }
+        
+        .contract-card:target {
+            animation: highlight 2s ease-out;
+        }
+        
+        h4:target {
+            animation: highlight 2s ease-out;
+        }
+        
+        @keyframes highlight {
+            0% { background-color: var(--primary-light); }
+            100% { background-color: transparent; }
+        }
+        
+         
+        @media (max-width:768px) {
+            .stats-container {grid-template-columns:1fr}
+            .jump-links-grid {grid-template-columns:1fr}
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        
+        <header>
+            <div class="header-content">
+                <span class="logo-text">Medusa Revert Report</span>
+                <a href="https://github.com/crytic/medusa" target="_blank" class="btn btn-secondary btn-sm">GitHub</a>
+            </div>
+        </header>
+
+        
+        <div class="main-content">
+            
+            <div class="stat-card" style="margin-bottom: 1.5rem;">
+                <p>This report shows how often contract functions revert during fuzzing and the reasons for those reverts.</p>
+            </div>
+            
+            
+            <details class="jump-links" id="contract-jump-links">
+                <summary>Jump to Contract</summary>
+                <div class="jump-links-grid" id="contract-links">
+                    
+                </div>
+            </details>
+            
+            
+            
+                <div class="contract-card" id="contract-GameMedusaTest">
+                    <div class="contract-header">
+                        GameMedusaTest
+                    </div>
+                    <div class="contract-content">
+                        <h3>Function Revert Summary</h3>
+                        <table class="revert-table">
+                            <tr>
+                                <th>Function</th>
+                                <th>Total Calls</th>
+                                <th>Total Reverts</th>
+                                <th>Revert Rate</th>
+                                <th>Previous Rate</th>
+                                <th>Change</th>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        FEE_INCREASE_PERCENTAGE
+                                    
+                                </td>
+                                <td>143</td>
+                                <td>0</td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 0.0%; background-color: var(--success);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                </td>
+                                <td>
+                                    
+                                        N/A
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        GRACE_PERIOD
+                                    
+                                </td>
+                                <td>176</td>
+                                <td>0</td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 0.0%; background-color: var(--success);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                </td>
+                                <td>
+                                    
+                                        N/A
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        INITIAL_CLAIM_FEE
+                                    
+                                </td>
+                                <td>222</td>
+                                <td>0</td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 0.0%; background-color: var(--success);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                </td>
+                                <td>
+                                    
+                                        N/A
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        PLATFORM_FEE_PERCENTAGE
+                                    
+                                </td>
+                                <td>139</td>
+                                <td>0</td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 0.0%; background-color: var(--success);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                </td>
+                                <td>
+                                    
+                                        N/A
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        deployer
+                                    
+                                </td>
+                                <td>217</td>
+                                <td>0</td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 0.0%; background-color: var(--success);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                </td>
+                                <td>
+                                    
+                                        N/A
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        game
+                                    
+                                </td>
+                                <td>145</td>
+                                <td>0</td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 0.0%; background-color: var(--success);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                </td>
+                                <td>
+                                    
+                                        N/A
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        <a href="#GameMedusaTest-game_claimThrone">game_claimThrone</a>
+                                    
+                                </td>
+                                <td>466668</td>
+                                <td>465388</td>
+                                <td class="revert-percentage">
+                                    99.7%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 99.7%; background-color: var(--danger);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    96.9%
+                                </td>
+                                <td>
+                                    
+                                        
+                                        <span class="change-positive">
+                                            Increased by 2.9%
+                                        </span>
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        <a href="#GameMedusaTest-game_declareWinner">game_declareWinner</a>
+                                    
+                                </td>
+                                <td>420776</td>
+                                <td>419953</td>
+                                <td class="revert-percentage">
+                                    99.8%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 99.8%; background-color: var(--danger);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    97.6%
+                                </td>
+                                <td>
+                                    
+                                        
+                                        <span class="change-positive">
+                                            Increased by 2.3%
+                                        </span>
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        <a href="#GameMedusaTest-game_resetGame">game_resetGame</a>
+                                    
+                                </td>
+                                <td>463235</td>
+                                <td>462735</td>
+                                <td class="revert-percentage">
+                                    99.9%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 99.9%; background-color: var(--danger);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    98.4%
+                                </td>
+                                <td>
+                                    
+                                        
+                                        <span class="change-positive">
+                                            Increased by 1.5%
+                                        </span>
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        <a href="#GameMedusaTest-game_updateClaimFeeParameters">game_updateClaimFeeParameters</a>
+                                    
+                                </td>
+                                <td>448540</td>
+                                <td>430843</td>
+                                <td class="revert-percentage">
+                                    96.1%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 96.1%; background-color: var(--danger);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    97.1%
+                                </td>
+                                <td>
+                                    
+                                        
+                                        <span class="change-negative">
+                                            Decreased by 1.1%
+                                        </span>
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        <a href="#GameMedusaTest-game_updateGracePeriod">game_updateGracePeriod</a>
+                                    
+                                </td>
+                                <td>509403</td>
+                                <td>393054</td>
+                                <td class="revert-percentage">
+                                    77.2%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 77.2%; background-color: var(--danger);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    85.9%
+                                </td>
+                                <td>
+                                    
+                                        
+                                        <span class="change-negative">
+                                            Decreased by 10.2%
+                                        </span>
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        <a href="#GameMedusaTest-game_updatePlatformFeePercentage">game_updatePlatformFeePercentage</a>
+                                    
+                                </td>
+                                <td>471353</td>
+                                <td>437047</td>
+                                <td class="revert-percentage">
+                                    92.7%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 92.7%; background-color: var(--danger);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    93.7%
+                                </td>
+                                <td>
+                                    
+                                        
+                                        <span class="change-negative">
+                                            Decreased by 1.0%
+                                        </span>
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        <a href="#GameMedusaTest-game_withdrawPlatformFees">game_withdrawPlatformFees</a>
+                                    
+                                </td>
+                                <td>436129</td>
+                                <td>435343</td>
+                                <td class="revert-percentage">
+                                    99.8%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 99.8%; background-color: var(--danger);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    97.9%
+                                </td>
+                                <td>
+                                    
+                                        
+                                        <span class="change-positive">
+                                            Increased by 2.0%
+                                        </span>
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        <a href="#GameMedusaTest-game_withdrawWinnings">game_withdrawWinnings</a>
+                                    
+                                </td>
+                                <td>467761</td>
+                                <td>467565</td>
+                                <td class="revert-percentage">
+                                    100.0%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 100.0%; background-color: var(--danger);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    99.7%
+                                </td>
+                                <td>
+                                    
+                                        
+                                        <span class="change-positive">
+                                            Increased by 0.3%
+                                        </span>
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        ghost_claimFee
+                                    
+                                </td>
+                                <td>154</td>
+                                <td>0</td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 0.0%; background-color: var(--success);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                </td>
+                                <td>
+                                    
+                                        N/A
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        ghost_claimFeeIncreasePercentage
+                                    
+                                </td>
+                                <td>164</td>
+                                <td>0</td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 0.0%; background-color: var(--success);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                </td>
+                                <td>
+                                    
+                                        N/A
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        ghost_playerClaimCount
+                                    
+                                </td>
+                                <td>798</td>
+                                <td>0</td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 0.0%; background-color: var(--success);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                </td>
+                                <td>
+                                    
+                                        N/A
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        <a href="#GameMedusaTest-ghost_players">ghost_players</a>
+                                    
+                                </td>
+                                <td>391</td>
+                                <td>328</td>
+                                <td class="revert-percentage">
+                                    83.9%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 83.9%; background-color: var(--danger);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    98.9%
+                                </td>
+                                <td>
+                                    
+                                        
+                                        <span class="change-negative">
+                                            Decreased by 15.2%
+                                        </span>
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        maliciousActor
+                                    
+                                </td>
+                                <td>167</td>
+                                <td>0</td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 0.0%; background-color: var(--success);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                </td>
+                                <td>
+                                    
+                                        N/A
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        player1
+                                    
+                                </td>
+                                <td>184</td>
+                                <td>0</td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 0.0%; background-color: var(--success);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                </td>
+                                <td>
+                                    
+                                        N/A
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        player2
+                                    
+                                </td>
+                                <td>224</td>
+                                <td>0</td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 0.0%; background-color: var(--success);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                </td>
+                                <td>
+                                    
+                                        N/A
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        player3
+                                    
+                                </td>
+                                <td>159</td>
+                                <td>0</td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 0.0%; background-color: var(--success);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                </td>
+                                <td>
+                                    
+                                        N/A
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        <a href="#GameMedusaTest-test_claimFeeUpdatesPerFeeIncreasePercentage">test_claimFeeUpdatesPerFeeIncreasePercentage</a>
+                                    
+                                </td>
+                                <td>260</td>
+                                <td>203</td>
+                                <td class="revert-percentage">
+                                    78.1%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 78.1%; background-color: var(--danger);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    57.2%
+                                </td>
+                                <td>
+                                    
+                                        
+                                        <span class="change-positive">
+                                            Increased by 36.4%
+                                        </span>
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        test_sumUserClaimsEqualsTotalClaims
+                                    
+                                </td>
+                                <td>190</td>
+                                <td>0</td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 0.0%; background-color: var(--success);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                </td>
+                                <td>
+                                    
+                                        N/A
+                                    
+                                </td>
+                            </tr>
+                            
+                        </table>
+
+                        <h3>Revert Reasons by Function</h3>
+                        
+                            
+                        
+                            
+                        
+                            
+                        
+                            
+                        
+                            
+                        
+                            
+                        
+                            
+                            <h4 id="GameMedusaTest-game_claimThrone">game_claimThrone</h4>
+                            <table class="revert-table">
+                                <tr>
+                                    <th>Revert Reason</th>
+                                    <th>Count</th>
+                                    <th>Percentage of Calls</th>
+                                    <th>Previous Rate</th>
+                                    <th>Change</th>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <div class="revert-reason">Amount should be less than 20_000 ether</div>
+                                    </td>
+                                    <td>264147</td>
+                                    <td class="revert-percentage">
+                                        56.6%
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 56.6%; background-color: var(--danger);"></div>
+                                        </div>
+                                    </td>
+                                    <td class="revert-percentage">
+                                        
+                                            58.4%
+                                        
+                                    </td>
+                                    <td>
+                                        
+                                            
+                                            <span class="change-negative">
+                                                Decreased by 3.1%
+                                            </span>
+                                        
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <div class="revert-reason">Can not be called by owner</div>
+                                    </td>
+                                    <td>73705</td>
+                                    <td class="revert-percentage">
+                                        15.8%
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 15.8%; background-color: var(--success);"></div>
+                                        </div>
+                                    </td>
+                                    <td class="revert-percentage">
+                                        
+                                            10.6%
+                                        
+                                    </td>
+                                    <td>
+                                        
+                                            
+                                            <span class="change-positive">
+                                                Increased by 49.0%
+                                            </span>
+                                        
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <div class="revert-reason">Game: Game has already ended. Reset to play again.</div>
+                                    </td>
+                                    <td>856</td>
+                                    <td class="revert-percentage">
+                                        0.2%
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 0.2%; background-color: var(--success);"></div>
+                                        </div>
+                                    </td>
+                                    <td class="revert-percentage">
+                                        
+                                            2.3%
+                                        
+                                    </td>
+                                    <td>
+                                        
+                                            
+                                            <span class="change-negative">
+                                                Decreased by 92.0%
+                                            </span>
+                                        
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <div class="revert-reason">Game: Insufficient ETH sent to claim the throne.</div>
+                                    </td>
+                                    <td>126632</td>
+                                    <td class="revert-percentage">
+                                        27.1%
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 27.1%; background-color: var(--warning);"></div>
+                                        </div>
+                                    </td>
+                                    <td class="revert-percentage">
+                                        
+                                            25.6%
+                                        
+                                    </td>
+                                    <td>
+                                        
+                                            
+                                            <span class="change-positive">
+                                                Increased by 5.9%
+                                            </span>
+                                        
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <div class="revert-reason">Game: You are already the king. No need to re-claim.</div>
+                                    </td>
+                                    <td>48</td>
+                                    <td class="revert-percentage">
+                                        0.0%
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 0.0%; background-color: var(--success);"></div>
+                                        </div>
+                                    </td>
+                                    <td class="revert-percentage">
+                                        
+                                            0.0%
+                                        
+                                    </td>
+                                    <td>
+                                        
+                                            
+                                            <span class="change-positive">
+                                                Increased by 1016.3%
+                                            </span>
+                                        
+                                    </td>
+                                </tr>
+                                
+                            </table>
+                            
+                        
+                            
+                            <h4 id="GameMedusaTest-game_declareWinner">game_declareWinner</h4>
+                            <table class="revert-table">
+                                <tr>
+                                    <th>Revert Reason</th>
+                                    <th>Count</th>
+                                    <th>Percentage of Calls</th>
+                                    <th>Previous Rate</th>
+                                    <th>Change</th>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <div class="revert-reason">Can not be called by owner</div>
+                                    </td>
+                                    <td>70791</td>
+                                    <td class="revert-percentage">
+                                        16.8%
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 16.8%; background-color: var(--success);"></div>
+                                        </div>
+                                    </td>
+                                    <td class="revert-percentage">
+                                        
+                                            19.4%
+                                        
+                                    </td>
+                                    <td>
+                                        
+                                            
+                                            <span class="change-negative">
+                                                Decreased by 13.1%
+                                            </span>
+                                        
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <div class="revert-reason">Game: Game has already ended. Reset to play again.</div>
+                                    </td>
+                                    <td>2518</td>
+                                    <td class="revert-percentage">
+                                        0.6%
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 0.6%; background-color: var(--success);"></div>
+                                        </div>
+                                    </td>
+                                    <td class="revert-percentage">
+                                        
+                                            6.5%
+                                        
+                                    </td>
+                                    <td>
+                                        
+                                            
+                                            <span class="change-negative">
+                                                Decreased by 90.8%
+                                            </span>
+                                        
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <div class="revert-reason">Game: Grace period has not expired yet.</div>
+                                    </td>
+                                    <td>1888</td>
+                                    <td class="revert-percentage">
+                                        0.4%
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 0.4%; background-color: var(--success);"></div>
+                                        </div>
+                                    </td>
+                                    <td class="revert-percentage">
+                                        
+                                            5.6%
+                                        
+                                    </td>
+                                    <td>
+                                        
+                                            
+                                            <span class="change-negative">
+                                                Decreased by 92.0%
+                                            </span>
+                                        
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <div class="revert-reason">Game: No one has claimed the throne yet.</div>
+                                    </td>
+                                    <td>344260</td>
+                                    <td class="revert-percentage">
+                                        81.8%
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 81.8%; background-color: var(--danger);"></div>
+                                        </div>
+                                    </td>
+                                    <td class="revert-percentage">
+                                        
+                                            65.2%
+                                        
+                                    </td>
+                                    <td>
+                                        
+                                            
+                                            <span class="change-positive">
+                                                Increased by 25.5%
+                                            </span>
+                                        
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <div class="revert-reason">panic: arithmetic underflow/overflow</div>
+                                    </td>
+                                    <td>496</td>
+                                    <td class="revert-percentage">
+                                        0.1%
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 0.1%; background-color: var(--success);"></div>
+                                        </div>
+                                    </td>
+                                    <td class="revert-percentage">
+                                        
+                                            0.9%
+                                        
+                                    </td>
+                                    <td>
+                                        
+                                            
+                                            <span class="change-negative">
+                                                Decreased by 87.2%
+                                            </span>
+                                        
+                                    </td>
+                                </tr>
+                                
+                            </table>
+                            
+                        
+                            
+                            <h4 id="GameMedusaTest-game_resetGame">game_resetGame</h4>
+                            <table class="revert-table">
+                                <tr>
+                                    <th>Revert Reason</th>
+                                    <th>Count</th>
+                                    <th>Percentage of Calls</th>
+                                    <th>Previous Rate</th>
+                                    <th>Change</th>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <div class="revert-reason">Game: Game has not ended yet.</div>
+                                    </td>
+                                    <td>79440</td>
+                                    <td class="revert-percentage">
+                                        17.1%
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 17.1%; background-color: var(--success);"></div>
+                                        </div>
+                                    </td>
+                                    <td class="revert-percentage">
+                                        
+                                            22.0%
+                                        
+                                    </td>
+                                    <td>
+                                        
+                                            
+                                            <span class="change-negative">
+                                                Decreased by 22.0%
+                                            </span>
+                                        
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <div class="revert-reason">OwnableUnauthorizedAccount</div>
+                                    </td>
+                                    <td>383295</td>
+                                    <td class="revert-percentage">
+                                        82.7%
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 82.7%; background-color: var(--danger);"></div>
+                                        </div>
+                                    </td>
+                                    <td class="revert-percentage">
+                                        
+                                            76.4%
+                                        
+                                    </td>
+                                    <td>
+                                        
+                                            
+                                            <span class="change-positive">
+                                                Increased by 8.3%
+                                            </span>
+                                        
+                                    </td>
+                                </tr>
+                                
+                            </table>
+                            
+                        
+                            
+                            <h4 id="GameMedusaTest-game_updateClaimFeeParameters">game_updateClaimFeeParameters</h4>
+                            <table class="revert-table">
+                                <tr>
+                                    <th>Revert Reason</th>
+                                    <th>Count</th>
+                                    <th>Percentage of Calls</th>
+                                    <th>Previous Rate</th>
+                                    <th>Change</th>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <div class="revert-reason">Can not update parameter if game isn&#39;t ended.</div>
+                                    </td>
+                                    <td>2572</td>
+                                    <td class="revert-percentage">
+                                        0.6%
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 0.6%; background-color: var(--success);"></div>
+                                        </div>
+                                    </td>
+                                    <td class="revert-percentage">
+                                        
+                                            7.2%
+                                        
+                                    </td>
+                                    <td>
+                                        
+                                            
+                                            <span class="change-negative">
+                                                Decreased by 92.0%
+                                            </span>
+                                        
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <div class="revert-reason">Game: New initial claim fee must be greater than zero.</div>
+                                    </td>
+                                    <td>1632</td>
+                                    <td class="revert-percentage">
+                                        0.4%
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 0.4%; background-color: var(--success);"></div>
+                                        </div>
+                                    </td>
+                                    <td class="revert-percentage">
+                                        
+                                            0.6%
+                                        
+                                    </td>
+                                    <td>
+                                        
+                                            
+                                            <span class="change-negative">
+                                                Decreased by 41.8%
+                                            </span>
+                                        
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <div class="revert-reason">Game: Percentage must be 0-100.</div>
+                                    </td>
+                                    <td>51291</td>
+                                    <td class="revert-percentage">
+                                        11.4%
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 11.4%; background-color: var(--success);"></div>
+                                        </div>
+                                    </td>
+                                    <td class="revert-percentage">
+                                        
+                                            9.4%
+                                        
+                                    </td>
+                                    <td>
+                                        
+                                            
+                                            <span class="change-positive">
+                                                Increased by 21.9%
+                                            </span>
+                                        
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <div class="revert-reason">OwnableUnauthorizedAccount</div>
+                                    </td>
+                                    <td>375348</td>
+                                    <td class="revert-percentage">
+                                        83.7%
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 83.7%; background-color: var(--danger);"></div>
+                                        </div>
+                                    </td>
+                                    <td class="revert-percentage">
+                                        
+                                            79.9%
+                                        
+                                    </td>
+                                    <td>
+                                        
+                                            
+                                            <span class="change-positive">
+                                                Increased by 4.7%
+                                            </span>
+                                        
+                                    </td>
+                                </tr>
+                                
+                            </table>
+                            
+                        
+                            
+                            <h4 id="GameMedusaTest-game_updateGracePeriod">game_updateGracePeriod</h4>
+                            <table class="revert-table">
+                                <tr>
+                                    <th>Revert Reason</th>
+                                    <th>Count</th>
+                                    <th>Percentage of Calls</th>
+                                    <th>Previous Rate</th>
+                                    <th>Change</th>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <div class="revert-reason">Game: New grace period must be greater than zero.</div>
+                                    </td>
+                                    <td>6629</td>
+                                    <td class="revert-percentage">
+                                        1.3%
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 1.3%; background-color: var(--success);"></div>
+                                        </div>
+                                    </td>
+                                    <td class="revert-percentage">
+                                        
+                                            1.3%
+                                        
+                                    </td>
+                                    <td>
+                                        
+                                            
+                                            <span class="change-negative">
+                                                Decreased by 2.5%
+                                            </span>
+                                        
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <div class="revert-reason">OwnableUnauthorizedAccount</div>
+                                    </td>
+                                    <td>386425</td>
+                                    <td class="revert-percentage">
+                                        75.9%
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 75.9%; background-color: var(--danger);"></div>
+                                        </div>
+                                    </td>
+                                    <td class="revert-percentage">
+                                        
+                                            84.6%
+                                        
+                                    </td>
+                                    <td>
+                                        
+                                            
+                                            <span class="change-negative">
+                                                Decreased by 10.3%
+                                            </span>
+                                        
+                                    </td>
+                                </tr>
+                                
+                            </table>
+                            
+                        
+                            
+                            <h4 id="GameMedusaTest-game_updatePlatformFeePercentage">game_updatePlatformFeePercentage</h4>
+                            <table class="revert-table">
+                                <tr>
+                                    <th>Revert Reason</th>
+                                    <th>Count</th>
+                                    <th>Percentage of Calls</th>
+                                    <th>Previous Rate</th>
+                                    <th>Change</th>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <div class="revert-reason">Game: Percentage must be 0-100.</div>
+                                    </td>
+                                    <td>48936</td>
+                                    <td class="revert-percentage">
+                                        10.4%
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 10.4%; background-color: var(--success);"></div>
+                                        </div>
+                                    </td>
+                                    <td class="revert-percentage">
+                                        
+                                            8.8%
+                                        
+                                    </td>
+                                    <td>
+                                        
+                                            
+                                            <span class="change-positive">
+                                                Increased by 17.4%
+                                            </span>
+                                        
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <div class="revert-reason">OwnableUnauthorizedAccount</div>
+                                    </td>
+                                    <td>388111</td>
+                                    <td class="revert-percentage">
+                                        82.3%
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 82.3%; background-color: var(--danger);"></div>
+                                        </div>
+                                    </td>
+                                    <td class="revert-percentage">
+                                        
+                                            84.8%
+                                        
+                                    </td>
+                                    <td>
+                                        
+                                            
+                                            <span class="change-negative">
+                                                Decreased by 2.9%
+                                            </span>
+                                        
+                                    </td>
+                                </tr>
+                                
+                            </table>
+                            
+                        
+                            
+                            <h4 id="GameMedusaTest-game_withdrawPlatformFees">game_withdrawPlatformFees</h4>
+                            <table class="revert-table">
+                                <tr>
+                                    <th>Revert Reason</th>
+                                    <th>Count</th>
+                                    <th>Percentage of Calls</th>
+                                    <th>Previous Rate</th>
+                                    <th>Change</th>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <div class="revert-reason">Game: No platform fees to withdraw.</div>
+                                    </td>
+                                    <td>71331</td>
+                                    <td class="revert-percentage">
+                                        16.4%
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 16.4%; background-color: var(--success);"></div>
+                                        </div>
+                                    </td>
+                                    <td class="revert-percentage">
+                                        
+                                            14.2%
+                                        
+                                    </td>
+                                    <td>
+                                        
+                                            
+                                            <span class="change-positive">
+                                                Increased by 15.6%
+                                            </span>
+                                        
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <div class="revert-reason">OwnableUnauthorizedAccount</div>
+                                    </td>
+                                    <td>364012</td>
+                                    <td class="revert-percentage">
+                                        83.5%
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 83.5%; background-color: var(--danger);"></div>
+                                        </div>
+                                    </td>
+                                    <td class="revert-percentage">
+                                        
+                                            83.7%
+                                        
+                                    </td>
+                                    <td>
+                                        
+                                            
+                                            <span class="change-negative">
+                                                Decreased by 0.3%
+                                            </span>
+                                        
+                                    </td>
+                                </tr>
+                                
+                            </table>
+                            
+                        
+                            
+                            <h4 id="GameMedusaTest-game_withdrawWinnings">game_withdrawWinnings</h4>
+                            <table class="revert-table">
+                                <tr>
+                                    <th>Revert Reason</th>
+                                    <th>Count</th>
+                                    <th>Percentage of Calls</th>
+                                    <th>Previous Rate</th>
+                                    <th>Change</th>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <div class="revert-reason">Can not be called by owner</div>
+                                    </td>
+                                    <td>81589</td>
+                                    <td class="revert-percentage">
+                                        17.4%
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 17.4%; background-color: var(--success);"></div>
+                                        </div>
+                                    </td>
+                                    <td class="revert-percentage">
+                                        
+                                            19.5%
+                                        
+                                    </td>
+                                    <td>
+                                        
+                                            
+                                            <span class="change-negative">
+                                                Decreased by 10.8%
+                                            </span>
+                                        
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <div class="revert-reason">Game: No winnings to withdraw.</div>
+                                    </td>
+                                    <td>385976</td>
+                                    <td class="revert-percentage">
+                                        82.5%
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 82.5%; background-color: var(--danger);"></div>
+                                        </div>
+                                    </td>
+                                    <td class="revert-percentage">
+                                        
+                                            80.2%
+                                        
+                                    </td>
+                                    <td>
+                                        
+                                            
+                                            <span class="change-positive">
+                                                Increased by 3.0%
+                                            </span>
+                                        
+                                    </td>
+                                </tr>
+                                
+                            </table>
+                            
+                        
+                            
+                        
+                            
+                        
+                            
+                        
+                            
+                            <h4 id="GameMedusaTest-ghost_players">ghost_players</h4>
+                            <table class="revert-table">
+                                <tr>
+                                    <th>Revert Reason</th>
+                                    <th>Count</th>
+                                    <th>Percentage of Calls</th>
+                                    <th>Previous Rate</th>
+                                    <th>Change</th>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <div class="revert-reason">unknown</div>
+                                    </td>
+                                    <td>328</td>
+                                    <td class="revert-percentage">
+                                        83.9%
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 83.9%; background-color: var(--danger);"></div>
+                                        </div>
+                                    </td>
+                                    <td class="revert-percentage">
+                                        
+                                            98.9%
+                                        
+                                    </td>
+                                    <td>
+                                        
+                                            
+                                            <span class="change-negative">
+                                                Decreased by 15.2%
+                                            </span>
+                                        
+                                    </td>
+                                </tr>
+                                
+                            </table>
+                            
+                        
+                            
+                        
+                            
+                        
+                            
+                        
+                            
+                        
+                            
+                            <h4 id="GameMedusaTest-test_claimFeeUpdatesPerFeeIncreasePercentage">test_claimFeeUpdatesPerFeeIncreasePercentage</h4>
+                            <table class="revert-table">
+                                <tr>
+                                    <th>Revert Reason</th>
+                                    <th>Count</th>
+                                    <th>Percentage of Calls</th>
+                                    <th>Previous Rate</th>
+                                    <th>Change</th>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <div class="revert-reason">No king yet</div>
+                                    </td>
+                                    <td>151</td>
+                                    <td class="revert-percentage">
+                                        58.1%
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 58.1%; background-color: var(--danger);"></div>
+                                        </div>
+                                    </td>
+                                    <td class="revert-percentage">
+                                        
+                                            24.8%
+                                        
+                                    </td>
+                                    <td>
+                                        
+                                            
+                                            <span class="change-positive">
+                                                Increased by 134.6%
+                                            </span>
+                                        
+                                    </td>
+                                </tr>
+                                
+                                <tr>
+                                    <td>
+                                        <div class="revert-reason">unknown</div>
+                                    </td>
+                                    <td>52</td>
+                                    <td class="revert-percentage">
+                                        20.0%
+                                        <div class="progress-container">
+                                            <div class="progress-bar" style="width: 20.0%; background-color: var(--success);"></div>
+                                        </div>
+                                    </td>
+                                    <td class="revert-percentage">
+                                        
+                                            32.5%
+                                        
+                                    </td>
+                                    <td>
+                                        
+                                            
+                                            <span class="change-negative">
+                                                Decreased by 38.4%
+                                            </span>
+                                        
+                                    </td>
+                                </tr>
+                                
+                            </table>
+                            
+                        
+                            
+                        
+                    </div>
+                </div>
+            
+                <div class="contract-card" id="contract-stdError">
+                    <div class="contract-header">
+                        stdError
+                    </div>
+                    <div class="contract-content">
+                        <h3>Function Revert Summary</h3>
+                        <table class="revert-table">
+                            <tr>
+                                <th>Function</th>
+                                <th>Total Calls</th>
+                                <th>Total Reverts</th>
+                                <th>Revert Rate</th>
+                                <th>Previous Rate</th>
+                                <th>Change</th>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        arithmeticError
+                                    
+                                </td>
+                                <td>7886</td>
+                                <td>0</td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 0.0%; background-color: var(--success);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                </td>
+                                <td>
+                                    
+                                        N/A
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        assertionError
+                                    
+                                </td>
+                                <td>948</td>
+                                <td>0</td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 0.0%; background-color: var(--success);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                </td>
+                                <td>
+                                    
+                                        N/A
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        divisionError
+                                    
+                                </td>
+                                <td>1217</td>
+                                <td>0</td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 0.0%; background-color: var(--success);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                </td>
+                                <td>
+                                    
+                                        N/A
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        encodeStorageError
+                                    
+                                </td>
+                                <td>2831</td>
+                                <td>0</td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 0.0%; background-color: var(--success);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                </td>
+                                <td>
+                                    
+                                        N/A
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        enumConversionError
+                                    
+                                </td>
+                                <td>2207</td>
+                                <td>0</td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 0.0%; background-color: var(--success);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                </td>
+                                <td>
+                                    
+                                        N/A
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        indexOOBError
+                                    
+                                </td>
+                                <td>1281</td>
+                                <td>0</td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 0.0%; background-color: var(--success);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                </td>
+                                <td>
+                                    
+                                        N/A
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        memOverflowError
+                                    
+                                </td>
+                                <td>1601</td>
+                                <td>0</td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 0.0%; background-color: var(--success);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                </td>
+                                <td>
+                                    
+                                        N/A
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        popError
+                                    
+                                </td>
+                                <td>1079</td>
+                                <td>0</td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 0.0%; background-color: var(--success);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                </td>
+                                <td>
+                                    
+                                        N/A
+                                    
+                                </td>
+                            </tr>
+                            
+                            <tr>
+                                <td>
+                                    
+                                        zeroVarError
+                                    
+                                </td>
+                                <td>3668</td>
+                                <td>0</td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                    <div class="progress-container">
+                                        <div class="progress-bar" style="width: 0.0%; background-color: var(--success);"></div>
+                                    </div>
+                                </td>
+                                <td class="revert-percentage">
+                                    0.0%
+                                </td>
+                                <td>
+                                    
+                                        N/A
+                                    
+                                </td>
+                            </tr>
+                            
+                        </table>
+
+                        <h3>Revert Reasons by Function</h3>
+                        
+                            
+                        
+                            
+                        
+                            
+                        
+                            
+                        
+                            
+                        
+                            
+                        
+                            
+                        
+                            
+                        
+                            
+                        
+                    </div>
+                </div>
+            
+        </div>
+
+        
+        <footer>
+            <div>Report generated by Medusa on August 14, 2025 at 07:41:16 UTC</div>
+            <div style="margin-top: 0.5rem">
+                <a href="https://github.com/crytic/medusa" target="_blank">github.com/crytic/medusa</a>
+            </div>
+        </footer>
+    </div>
+
+    
+    <button class="scroll-top" id="scroll-top" title="Scroll to top">↑</button>
+
+    <script>
+        
+        function contains(str, substr) {
+            return str.indexOf(substr) !== -1;
+        }
+        
+        
+        function buildJumpLinks() {
+            const contractCards = document.querySelectorAll('.contract-card');
+            const contractLinks = document.getElementById('contract-links');
+            const jumpLinksContainer = document.getElementById('contract-jump-links');
+            
+            
+            if (contractCards.length <= 1) {
+                jumpLinksContainer.style.display = 'none';
+                return;
+            }
+            
+            
+            jumpLinksContainer.style.display = 'block';
+            
+            
+            contractLinks.innerHTML = '';
+            
+            
+            contractCards.forEach(card => {
+                const contractName = card.querySelector('.contract-header').textContent.trim();
+                const contractId = card.id;
+                
+                const link = document.createElement('a');
+                link.href = `#${contractId}`;
+                link.textContent = contractName;
+                link.style.display = 'block';
+                link.style.padding = '0.375rem 0.5rem';
+                link.style.borderRadius = 'var(--radius)';
+                
+                link.addEventListener('mouseover', () => {
+                    link.style.backgroundColor = 'var(--gray-100)';
+                });
+                
+                link.addEventListener('mouseout', () => {
+                    link.style.backgroundColor = 'transparent';
+                });
+                
+                contractLinks.appendChild(link);
+            });
+        }
+        
+        
+        function setupScrollToTop() {
+            const scrollTopButton = document.getElementById('scroll-top');
+            
+            
+            window.addEventListener('scroll', () => {
+                if (window.pageYOffset > 300) {
+                    scrollTopButton.classList.add('visible');
+                } else {
+                    scrollTopButton.classList.remove('visible');
+                }
+            });
+            
+            
+            scrollTopButton.addEventListener('click', () => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+        }
+        
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            buildJumpLinks();
+            setupScrollToTop();
+        });
+    </script>
+</body>
+</html>
